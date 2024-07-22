@@ -1,0 +1,68 @@
+from collections import deque
+
+class WaterJugSolver:
+    def _init_(self, jug1_capacity, jug2_capacity, target):
+        self.jug1_capacity = jug1_capacity
+        self.jug2_capacity = jug2_capacity
+        self.target = target
+        self.visited = set()
+
+    def is_target_reached(self, state):
+        return state[0] == self.target or state[1] == self.target
+
+    def get_successors(self, state):
+        (jug1, jug2) = state
+        successors = []
+
+        # Fill Jug1
+        successors.append((self.jug1_capacity, jug2))
+        # Fill Jug2
+        successors.append((jug1, self.jug2_capacity))
+        # Empty Jug1
+        successors.append((0, jug2))
+        # Empty Jug2
+        successors.append((jug1, 0))
+        # Pour Jug1 -> Jug2
+        pour_to_jug2 = min(jug1, self.jug2_capacity - jug2)
+        successors.append((jug1 - pour_to_jug2, jug2 + pour_to_jug2))
+        # Pour Jug2 -> Jug1
+        pour_to_jug1 = min(jug2, self.jug1_capacity - jug1)
+        successors.append((jug1 + pour_to_jug1, jug2 - pour_to_jug1))
+
+        return successors
+
+    def bfs(self):
+        start = (0, 0)
+        queue = deque([(start, [])])
+        self.visited.add(start)
+
+        while queue:
+            (current_state, path) = queue.popleft()
+
+            if self.is_target_reached(current_state):
+                return path + [current_state]
+
+            for successor in self.get_successors(current_state):
+                if successor not in self.visited:
+                    self.visited.add(successor)
+                    queue.append((successor, path + [current_state]))
+
+        return None
+
+def main():
+    jug1_capacity = 4
+    jug2_capacity = 3
+    target = 2
+
+    solver = WaterJugSolver(jug1_capacity, jug2_capacity, target)
+    solution = solver.bfs()
+
+    if solution:
+        print("Solution path:")
+        for state in solution:
+            print(state)
+    else:
+        print("No solution found.")
+
+if _name_ == "_main_":
+    main()
