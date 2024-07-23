@@ -1,0 +1,45 @@
+def is_valid(graph, colors, node, color):
+    for neighbor in graph[node]:
+        if colors[neighbor] == color:
+            return False
+    return True
+
+def backtrack(graph, colors, node, color_list):
+    if node == len(graph):
+        return True
+    
+    for color in color_list:
+        if is_valid(graph, colors, node, color):
+            colors[node] = color
+            if backtrack(graph, colors, node + 1, color_list):
+                return True
+            colors[node] = None
+
+    return False
+
+def map_coloring(graph, color_list):
+    colors = [None] * len(graph)
+    if not backtrack(graph, colors, 0, color_list):
+        return None
+    return colors
+
+# Example usage
+if __name__ == "__main__":
+    # Define the graph as an adjacency list
+    graph = {
+        0: [1, 2],
+        1: [0, 2, 3],
+        2: [0, 1, 3],
+        3: [1, 2]
+    }
+
+    # Define a list of colors
+    color_list = ["Red", "Green", "Blue"]
+
+    solution = map_coloring(graph, color_list)
+    
+    if solution:
+        for node in range(len(solution)):
+            print(f"Node {node} is colored {solution[node]}")
+    else:
+        print("No solution found.")
