@@ -1,0 +1,42 @@
+from itertools import permutations
+
+def calculate_total_distance(permutation, distance_matrix):
+    total_distance = 0
+    num_cities = len(permutation)
+    
+    for i in range(num_cities):
+        total_distance += distance_matrix[permutation[i]][permutation[(i + 1) % num_cities]]
+    
+    return total_distance
+
+def travelling_salesman_problem(distance_matrix):
+    num_cities = len(distance_matrix)
+    cities = range(num_cities)
+    
+    # Generate all possible permutations of cities (excluding the starting city)
+    min_path = None
+    min_distance = float('inf')
+    
+    for permutation in permutations(cities):
+        # Calculate the total distance for this permutation
+        current_distance = calculate_total_distance(permutation, distance_matrix)
+        
+        if current_distance < min_distance:
+            min_distance = current_distance
+            min_path = permutation
+    
+    return min_path, min_distance
+
+# Example usage
+if __name__ == "__main__":
+    # Define a distance matrix for the cities
+    distance_matrix = [
+        [0, 10, 15, 20],
+        [10, 0, 35, 25],
+        [15, 35, 0, 30],
+        [20, 25, 30, 0]
+    ]
+    
+    min_path, min_distance = travelling_salesman_problem(distance_matrix)
+    print("Shortest path:", min_path)
+    print("Minimum distance:", min_distance)
