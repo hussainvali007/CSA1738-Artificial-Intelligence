@@ -1,0 +1,54 @@
+from queue import PriorityQueue
+
+def a_star(graph, start, goal, heuristic):
+    # Priority queue to store (cost, current_node, path)
+    queue = PriorityQueue()
+    queue.put((0, start, [start]))
+
+    # Dictionary to store the cost of the shortest path found so far to each node
+    g_costs = {start: 0}
+
+    while not queue.empty():
+        current_cost, current_node, path = queue.get()
+
+        if current_node == goal:
+            return path, current_cost
+
+        for neighbor, weight in graph[current_node].items():
+            new_cost = g_costs[current_node] + weight
+
+            if neighbor not in g_costs or new_cost < g_costs[neighbor]:
+                g_costs[neighbor] = new_cost
+                priority = new_cost + heuristic(neighbor, goal)
+                queue.put((priority, neighbor, path + [neighbor]))
+
+    return None, float('inf')
+
+# Example usage
+if __name__ == "__main__":
+    # Define the graph as an adjacency list with weights
+    graph = {
+        'A': {'B': 1, 'C': 4},
+        'B': {'A': 1, 'C': 2, 'D': 5},
+        'C': {'A': 4, 'B': 2, 'D': 1},
+        'D': {'B': 5, 'C': 1}
+    }
+
+    # Define a heuristic function (example: straight-line distance)
+    def heuristic(node, goal):
+        heuristics = {
+            'A': 7,
+            'B': 6,
+            'C': 2,
+            'D': 0
+        }
+        return heuristics[node]
+
+    start = 'A'
+    goal = 'D'
+    path, cost = a_star(graph, start, goal, heuristic)
+    
+    if path:
+        print(f"Path found: {' -> '.join(path)} with total cost: {cost}")
+    else:
+        print("No path found.")
